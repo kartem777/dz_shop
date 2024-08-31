@@ -1,0 +1,68 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using dz_shop.Models;
+@model IndexViewModel
+@addTagHelper *, dz_shop
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<style>
+    td, th {padding: 0 15px 0 0;}
+
+    .glyphicon{
+        border: #000000;
+        border-width: 0 3px 0 3px;
+        display: inline-block;
+        padding: 3px;
+        margin 0 5px;    
+    }
+
+    .glyphicon-chevron-up{
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+
+    .glyphicon-chevron-down {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+    }
+</style>
+<form method="get">
+    <div>
+        <label>Name</label>
+        <input asp-for="Name"/>
+        <label>Department:</label>
+        <select name="department" asp-items="@Model.Departments"></select>
+        <input type="submit" class="btn btn-success" value="filter" />
+    </div>
+</form>
+<h1>Items' list</h1>
+<table>
+    <tr>
+        <th>
+            <button type="button" class="btn btn-danger">Name
+                <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.NameSort">.  
+                </sort-header>
+            </button>
+        </th>
+        <th>
+            <button type="button" class="btn btn-warning">Price
+            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.PriceSort">.   
+            </sort-header>
+            </button>
+        </th>
+        <th>
+            <button type="button" class="btn btn-danger">Company
+            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.CompanySort">.
+            </sort-header>
+            </button>
+        </th>
+        <th>
+            <button type="button" class="btn btn-warning">Department  
+                <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.DepartmentSort">.
+                </sort-header>
+            </button>
+        </th>
+    </tr>
+    @foreach (Item i in Model.Items)
+    {
+        <tr><td>@i.Name</td><td>@i.Price</td><td>@i.Company?.Name</td><td>@i.Department?.Name</td></tr>
+    }
+</table>
