@@ -63,6 +63,14 @@
     </tr>
     @foreach (Item i in Model.Items)
     {
-        <tr><td>@i.Name</td><td>@i.Price</td><td>@i.Company?.Name</td><td>@i.Department?.Name</td></tr>
+        <tr>
+            <td>@i.Name</td>
+            <td>@i.Price</td>
+            <td>@i.Company?.Name</td>
+            <td>@i.Department?.Name</td>
+            <td>
+                <a asp-action="Buy" asp-route-id="@i.Id" class="btn btn-success">Buy</a>
+            </td>
+        </tr>
     }
 </table>

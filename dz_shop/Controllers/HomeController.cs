@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using dz_shop.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace dz_shop.Controllers
 {
     public class HomeController : Controller
     {
         ItemsContext db;
+
         public HomeController(ItemsContext db)
         {
             this.db = db;
@@ -89,6 +91,182 @@ namespace dz_shop.Controllers
             };
 
             return View(viewModel);
+        }
+
+
+
+        public IActionResult Info()
+        {
+            return View();
+        }
+        [Authorize(Roles = "admin")]
+        public IActionResult AdminPanel()
+        {
+            IQueryable<Item>? items = db.Items.Include(x => x.Company).Include(y => y.Department);
+            return View(items);
+        }
+        [Authorize(Roles = "admin")]
+
+
+
+        public IActionResult Edit(int id)
+        {
+            var item = db.Items.Include(i => i.Company).Include(i => i.Department).FirstOrDefault(i => i.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Companies = db.Companies.ToList();
+            ViewBag.Departments = db.Departments.ToList();
+
+            return View(item);
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Item updatedItem)
+        {
+            if (id != updatedItem.Id)
+            {
+                return BadRequest();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    db.Update(updatedItem);
+                    db.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException)
+                {
+                    return View(updatedItem);
+                }
+            }
+
+            return View(updatedItem);
+        }
+
+
+
+        [Authorize(Roles = "admin")]
+        public IActionResult Create()
+        {
+            ViewBag.Companies = db.Companies.ToList();
+            ViewBag.Departments = db.Departments.ToList();
+            return View();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Item newItem)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Items.Add(newItem);
+                db.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }            
+            
+            ViewBag.Companies = db.Companies.ToList();
+            ViewBag.Departments = db.Departments.ToList();
+            return View(newItem);
+        }
+
+
+
+        [Authorize(Roles = "admin")]
+        public IActionResult Delete(int id)
+        {
+            var item = db.Items.FirstOrDefault(i => i.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var item = db.Items.FirstOrDefault(i => i.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            db.Items.Remove(item);
+            db.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+        [Authorize(Roles = "admin,user")]
+        public IActionResult Buy(int id)
+        {
+            var item = db.Items.FirstOrDefault(i => i.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            var order = new Order
+            {
+                ItemId = item.Id,
+                Item = item,
+                Price = item.Price
+            };
+
+            return View(order);
+        }
+        
+        [Authorize(Roles = "admin,user")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Buy(Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction(nameof(Receipt), new
+                {
+                    itemId = order.ItemId,
+                    address = order.Address,
+                    deliveryOption = order.DeliveryOption,
+                    totalPrice = order.Price
+                });
+            }
+
+            return View(order);
+        }
+
+
+
+        [Authorize(Roles = "admin,user")]
+        public IActionResult Receipt(int itemId, string address, string deliveryOption, int totalPrice)
+        {
+            var item = db.Items.FirstOrDefault(i => i.Id == itemId);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            var order = new Order
+            {
+                ItemId = item.Id,
+                Item = item,
+                Address = address,
+                DeliveryOption = deliveryOption,
+                Price = totalPrice
+            };
+
+            return View(order);
         }
     }
 }

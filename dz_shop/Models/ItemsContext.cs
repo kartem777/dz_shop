@@ -10,7 +10,7 @@ namespace dz_shop.Models
 
         public ItemsContext(DbContextOptions<ItemsContext> options) : base(options)
         {
-            Database.EnsureDeleted();
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
     }

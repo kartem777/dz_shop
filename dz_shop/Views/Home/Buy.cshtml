@@ -1,0 +1,35 @@
+﻿<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+@model dz_shop.Models.Order
+
+<h2>Buy Item</h2>
+
+<form asp-action="Buy" method="post">
+    <input type="hidden" asp-for="ItemId" />
+    <div class="form-group">
+        <label asp-for="Item.Name">Item:</label>
+        <input asp-for="Item.Name" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price">Price:</label>
+        <input asp-for="Price" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address">Delivery Address:</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DeliveryOption">Delivery Option:</label>
+        <select asp-for="DeliveryOption" class="form-control">
+            <option>Standard</option>
+            <option>Express</option>
+        </select>
+        <span asp-validation-for="DeliveryOption" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<a asp-action="Index">Back to List</a>
